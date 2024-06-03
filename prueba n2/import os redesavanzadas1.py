@@ -1,4 +1,6 @@
 import os
+import ipaddress
+import json
 
 # Función para limpiar la pantalla de manera compatible con diferentes sistemas operativos
 def clear_screen():
@@ -13,124 +15,35 @@ def mostrar_dispositivos(sector, dispositivos_por_sector):
         print("Dispositivos en el sector seleccionado:")
         dispositivos = dispositivos_por_sector[sector]['dispositivos']
         for i, dispositivo in enumerate(dispositivos, 1):
-            print(f"{i} - {dispositivo}")
+            print(f"{i} - {dispositivo['nombre']}")
         dispositivo_elegido = int(input("Elija un dispositivo para ver más detalles: "))
         if 1 <= dispositivo_elegido <= len(dispositivos):
-            if sector == 1:  # Sucursal Principal
-                if dispositivo_elegido == 1:  # Router seleccionado
-                    leer_archivo_routersucursal()
-                elif dispositivo_elegido == 2:  # Switch Multicapa seleccionado
-                    leer_archivo_switchmulticapa()
-                elif dispositivo_elegido == 3:  # Dispositivos Finales seleccionado
-                    leer_archivo_dispositivofinal()
-                else:
-                    print(f"Detalles del dispositivo: {dispositivos[dispositivo_elegido - 1]}")
-            elif sector == 2:  # Backbone
-                if dispositivo_elegido == 1:  # Router seleccionado
-                    leer_archivo_routerblackbone()
-                else:
-                    print(f"Detalles del dispositivo: {dispositivos[dispositivo_elegido - 1]}")
-            elif sector == 3:  # BGP 2345
-                if dispositivo_elegido == 1:  # Router BGP 2345 seleccionado
-                    leer_archivo_routerbgp2345()
-                else:
-                    print(f"Detalles del dispositivo: {dispositivos[dispositivo_elegido - 1]}")
-            elif sector == 4:  # Oficina Remota
-                if dispositivo_elegido == 1:  # Oficina Remota 1 seleccionado
-                    leer_archivo_oficinaremota1()
-                elif dispositivo_elegido == 2:  # Oficina Remota 2 seleccionado
-                    leer_archivo_oficinaremota2()
-                else:
-                    print(f"Detalles del dispositivo: {dispositivos[dispositivo_elegido - 1]}")
-            elif sector == 5:  # OSPF Area 123
-                if dispositivo_elegido == 1:  # OSPF Area 123 seleccionado
-                    leer_archivo_ospfarea123()
-                else:
-                    print(f"Detalles del dispositivo: {dispositivos[dispositivo_elegido - 1]}")
+            dispositivo = dispositivos[dispositivo_elegido - 1]
+            print(f"Detalles del dispositivo: {json.dumps(dispositivo, indent=4)}")
+            if 'archivo' in dispositivo:
+                leer_archivo(dispositivo['archivo'])
         else:
             print("Dispositivo no válido.")
     else:
         print("Sector no válido.")
 
-# Función para leer el archivo Routersucursal.txt
-def leer_archivo_routersucursal():
+# Función para validar una dirección IP
+def validar_ip(ip):
     try:
-        with open("Routersucursal.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de Routersucursal.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo Routersucursal.txt no se encuentra.")
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        return False
 
-# Función para leer el archivo Routerblackbone.txt
-def leer_archivo_routerblackbone():
+# Función para leer archivos específicos
+def leer_archivo(nombre_archivo):
     try:
-        with open("Routerblackbone.txt", "r") as file:
+        with open(nombre_archivo, "r") as file:
             contenido = file.read()
-            print("Contenido de Routerblackbone.txt:")
+            print(f"Contenido de {nombre_archivo}:")
             print(contenido)
     except FileNotFoundError:
-        print("El archivo Routerblackbone.txt no se encuentra.")
-
-# Función para leer el archivo RouterBGP2345.txt
-def leer_archivo_routerbgp2345():
-    try:
-        with open("RouterBGP2345.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de RouterBGP2345.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo RouterBGP2345.txt no se encuentra.")
-
-# Función para leer el archivo oficina remota 1.txt
-def leer_archivo_oficinaremota1():
-    try:
-        with open("oficina remota 1.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de oficina remota 1.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo oficina remota 1.txt no se encuentra.")
-
-# Función para leer el archivo oficina remota 2.txt
-def leer_archivo_oficinaremota2():
-    try:
-        with open("oficina remota 2.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de oficina remota 2.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo oficina remota 2.txt no se encuentra.")
-
-# Función para leer el archivo switchmulticapa.txt
-def leer_archivo_switchmulticapa():
-    try:
-        with open("switchmulticapa.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de switchmulticapa.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo switchmulticapa.txt no se encuentra.")
-
-# Función para leer el archivo dispositivofinal.txt
-def leer_archivo_dispositivofinal():
-    try:
-        with open("dispositivofinal.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de dispositivofinal.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo dispositivofinal.txt no se encuentra.")
-
-# Función para leer el archivo OSPF Area 123.txt
-def leer_archivo_ospfarea123():
-    try:
-        with open("OSPF Area 123.txt", "r") as file:
-            contenido = file.read()
-            print("Contenido de OSPF Area 123.txt:")
-            print(contenido)
-    except FileNotFoundError:
-        print("El archivo OSPF Area 123.txt no se encuentra.")
+        print(f"El archivo {nombre_archivo} no se encuentra.")
 
 # Función para generar los archivos solicitados
 def generar_archivos_txt():
@@ -151,11 +64,11 @@ def borrar_dispositivo(sector, dispositivos_por_sector):
         print("Dispositivos en el sector seleccionado:")
         dispositivos = dispositivos_por_sector[sector]['dispositivos']
         for i, dispositivo in enumerate(dispositivos, 1):
-            print(f"{i} - {dispositivo}")
+            print(f"{i} - {dispositivo['nombre']}")
         dispositivo_elegido = int(input("Elija el número del dispositivo a borrar: "))
         if 1 <= dispositivo_elegido <= len(dispositivos):
             dispositivo_borrado = dispositivos.pop(dispositivo_elegido - 1)
-            print(f"Dispositivo '{dispositivo_borrado}' borrado con éxito.")
+            print(f"Dispositivo '{dispositivo_borrado['nombre']}' borrado con éxito.")
         else:
             print("Número de dispositivo no válido.")
     else:
@@ -164,9 +77,31 @@ def borrar_dispositivo(sector, dispositivos_por_sector):
 # Función para añadir dispositivos a un sector
 def añadir_dispositivo(sector, dispositivos_por_sector):
     if sector in dispositivos_por_sector:
-        nuevo_dispositivo = input("Ingrese el nombre del nuevo dispositivo: ")
+        nombre = input("Ingrese el nombre del nuevo dispositivo: ")
+        ip = input("Ingrese la IP del nuevo dispositivo: ")
+        while not validar_ip(ip):
+            print("IP no válida. Intente de nuevo.")
+            ip = input("Ingrese la IP del nuevo dispositivo: ")
+        vlan = input("Ingrese la VLAN del nuevo dispositivo: ")
+        modelo = input("Ingrese el modelo jerárquico del nuevo dispositivo (Núcleo, Distribución, Acceso): ")
+        while modelo not in ["Núcleo", "Distribución", "Acceso"]:
+            print("Modelo jerárquico no válido. Intente de nuevo.")
+            modelo = input("Ingrese el modelo jerárquico del nuevo dispositivo (Núcleo, Distribución, Acceso): ")
+        servicios = input("Ingrese los servicios del nuevo dispositivo: ")
+        archivo = input("Ingrese el nombre del archivo asociado (opcional): ")
+
+        nuevo_dispositivo = {
+            'nombre': nombre,
+            'ip': ip,
+            'vlan': vlan,
+            'modelo': modelo,
+            'servicios': servicios
+        }
+        if archivo:
+            nuevo_dispositivo['archivo'] = archivo
+
         dispositivos_por_sector[sector]['dispositivos'].append(nuevo_dispositivo)
-        print(f"Dispositivo '{nuevo_dispositivo}' añadido con éxito al sector {sector}.")
+        print(f"Dispositivo '{nombre}' añadido con éxito al sector {sector}.")
     else:
         print("Sector no válido.")
 
@@ -203,11 +138,39 @@ def mostrar_sectores(dispositivos_por_sector):
 
 # Diccionario para almacenar los dispositivos por sector
 dispositivos_por_sector = {
-    1: {'nombre': "Sucursal Principal", 'dispositivos': ["Router", "Switch Multicapa", "Dispositivos Finales"]},
-    2: {'nombre': "Backbone", 'dispositivos': ["Router", "Switch Multicapa", "Dispositivos Finales"]},
-    3: {'nombre': "BGP 2345", 'dispositivos': ["Router BGP 2345", "Switch Multicapa", "Dispositivos Finales"]},
-    4: {'nombre': "Oficina Remota", 'dispositivos': ["Oficina Remota 1", "Oficina Remota 2", "Switch Multicapa", "Dispositivos Finales"]},
-    5: {'nombre': "OSPF Area 123", 'dispositivos': ["OSPF Area 123"]}
+    1: {
+        'nombre': "Sucursal Principal",
+        'dispositivos': [
+            {'nombre': "Router", 'ip': "192.168.1.1", 'vlan': "10", 'modelo': "Núcleo", 'servicios': "Enrutamiento, Firewall", 'archivo': "Routersucursal.txt"},
+            {'nombre': "Switch Multicapa", 'ip': "192.168.1.2", 'vlan': "20", 'modelo': "Distribución", 'servicios': "Conmutación", 'archivo': "switchmulticapa.txt"},
+            {'nombre': "Dispositivos Finales", 'ip': "192.168.1.3", 'vlan': "30", 'modelo': "Acceso", 'servicios': "Acceso a red", 'archivo': "dispositivofinal.txt"}
+        ]
+    },
+    2: {
+        'nombre': "Backbone",
+        'dispositivos': [
+            {'nombre': "Router", 'ip': "10.0.0.1", 'vlan': "40", 'modelo': "Núcleo", 'servicios': "Enrutamiento", 'archivo': "Routerblackbone.txt"}
+        ]
+    },
+    3: {
+        'nombre': "BGP 2345",
+        'dispositivos': [
+            {'nombre': "Router BGP 2345", 'ip': "10.1.0.1", 'vlan': "50", 'modelo': "Núcleo", 'servicios': "Enrutamiento", 'archivo': "RouterBGP2345.txt"}
+        ]
+    },
+    4: {
+        'nombre': "Oficina Remota",
+        'dispositivos': [
+            {'nombre': "Oficina Remota 1", 'ip': "172.16.0.1", 'vlan': "60", 'modelo': "Distribución", 'servicios': "Conmutación", 'archivo': "oficina remota 1.txt"},
+            {'nombre': "Oficina Remota 2", 'ip': "172.16.0.2", 'vlan': "70", 'modelo': "Distribución", 'servicios': "Conmutación", 'archivo': "oficina remota 2.txt"}
+        ]
+    },
+    5: {
+        'nombre': "OSPF Area 123",
+        'dispositivos': [
+            {'nombre': "OSPF Area 123", 'ip': "10.2.0.1", 'vlan': "80", 'modelo': "Distribución", 'servicios': "Enrutamiento", 'archivo': "OSPF Area 123.txt"}
+        ]
+    }
 }
 
 # Generar los archivos solicitados al inicio del programa

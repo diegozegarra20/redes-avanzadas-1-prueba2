@@ -14,3 +14,4 @@ IP: 10.1.23.2/30 (Interfaz hacia R2)
 Router R4:
 IP: 10.1.14.2/30 (Interfaz hacia R1)
 IP: 10.1.24.2/30 (Interfaz hacia R2)
+
