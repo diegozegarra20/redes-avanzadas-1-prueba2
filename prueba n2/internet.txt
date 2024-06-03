@@ -1,1 +1,2 @@
 Contenido del archivo internet.txt
+ip addres 18.25.6.4
